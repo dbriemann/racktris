@@ -118,3 +118,20 @@
    (for/fold ([rotations (list block)])
              ([n (in-range 3)])
      (cons (rotate-clockwise (car rotations)) rotations))))
+
+(define/contract (rotate-clockwise* block times)
+  (-> valid-block? exact-nonnegative-integer? valid-block?)
+  (if (> times 0)
+      (let ([rotated (rotate-clockwise block)])
+        (rotate-clockwise* rotated (sub1 times)))
+      block))
+
+(define/contract (rotate-counter-clockwise block)
+  (-> valid-block? valid-block?)
+  (rotate-clockwise* block 3))
+
+(module+ test
+  (for ([block (in-list all-blocks)])
+    (check-equal? (rotate-clockwise* block 4) block)
+    (check-equal? (rotate-clockwise (rotate-counter-clockwise block)) block)))
+
